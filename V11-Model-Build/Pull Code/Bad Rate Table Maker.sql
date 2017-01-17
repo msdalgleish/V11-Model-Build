@@ -1,3 +1,5 @@
+--how does git work?
+
 -- Payday --
 
 drop table if exists mdalgleish.payday_bad_rates;
