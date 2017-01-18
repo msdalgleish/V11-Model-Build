@@ -134,7 +134,7 @@ left join oec.oec_statements os on os.id =
 (select min(id) from oec.oec_statements where loan_id = l.id)
 
 left join customer_sources cs on cs.id =
-(select id from customer_sources where customer_id = l.customer_id and created_on between l.requested_time - interval '3 days' and l.requested_time + interval '30 minutes' order by id asc limit 1)
+(select id from customer_sources where customer_id = l.customer_id and created_on between l.requested_time - interval '3 days' and l.requested_time + interval '30 minutes' and type_cd in ('import','lead_reject_import','pass_active_customer') order by id asc limit 1)
 
 left join approvals a on a.id =
 (select id from approvals where customer_id = l.customer_id and processed_on <= l.requested_time order by id desc limit 1)
