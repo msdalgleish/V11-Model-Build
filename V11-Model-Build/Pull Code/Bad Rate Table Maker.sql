@@ -1,5 +1,3 @@
---how does git work?
-
 -- Payday --
 
 drop table if exists mdalgleish.payday_bad_rates;
@@ -21,7 +19,7 @@ from loans l
 left join loan_statuses ls on ls.id =
 (select id from loan_statuses where loan_id = l.id and status_cd in ('in_default','in_default_pmt_proc') limit 1)
 left join customer_sources cs on cs.id =
-(select id from customer_sources where customer_id = l.customer_id and created_on between l.requested_time - interval '3 days' and l.requested_time + interval '30 minutes' order by id asc limit 1)
+(select id from customer_sources where customer_id = l.customer_id and created_on between l.requested_time - interval '3 days' and l.requested_time + interval '30 minutes' and type_cd in ('import','lead_reject_import','pass_active_customer') order by id asc limit 1)
 left join approvals a on a.id =
 (select id from approvals where customer_id = l.customer_id and processed_on <= l.requested_time order by id desc limit 1)
 left join lexis_nexis.risk_view_reports rv ON rv.id = a.risk_view_report_id
@@ -71,7 +69,7 @@ left join installment_status_history ish on ish.id =
 (select id from installment_status_history where installments_static_id = i.id and installment_status_id in (3,4) limit 1)
 
 left join customer_sources cs on cs.id =
-(select id from customer_sources where customer_id = l.customer_id and created_on between l.requested_time - interval '3 days' and l.requested_time + interval '30 minutes' order by id asc limit 1)
+(select id from customer_sources where customer_id = l.customer_id and created_on between l.requested_time - interval '3 days' and l.requested_time + interval '30 minutes' and type_cd in ('import','lead_reject_import','pass_active_customer') order by id asc limit 1)
 
 left join approvals a on a.id =
 (select id from approvals where customer_id = l.customer_id and processed_on <= l.requested_time order by id desc limit 1)

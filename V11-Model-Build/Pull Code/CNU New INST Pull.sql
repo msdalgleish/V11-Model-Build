@@ -50,11 +50,11 @@ l.id as loan_id
 ,c.created_on as customer_created
 ,l.gov_law_state_cd as state
 
-,(select count(*) from approvals where customer_id = a.customer_id and processed_on < a.processed_on - interval '3 days') as previous_application_count
+--,(select count(*) from approvals where customer_id = a.customer_id and processed_on < a.processed_on - interval '3 days') as previous_application_count
 
 ,(select count(distinct processed_on::date) from approvals where customer_id = a.customer_id and processed_on < a.processed_on - interval '3 days') as previous_application_count_dist_day
 
-,(select count(*) from customer_sources where customer_id = a.customer_id and created_on::date < a.processed_on - interval '3 days') as previous_customer_sources_count
+--,(select count(*) from customer_sources where customer_id = a.customer_id and created_on::date < a.processed_on - interval '3 days') as previous_customer_sources_count
 
 ,(select count(distinct created_on::date) from customer_sources where customer_id = a.customer_id and created_on::date < a.processed_on - interval '3 days') as previous_customer_sources_count_dist_day
 
@@ -65,6 +65,7 @@ l.id as loan_id
 ,case when cs4.id is not null then 1 else 0 end as rejected_leads_flg
 ,case when cs3.id is not null then cs3.source_type_cd else 'organic' end as lead_provider
 
+--probably don't include these people in the data pull
 ,case when a.profitability_rate = 1 or a.reason_cd = 'pre-approved' or a.pre_approved_flg = 't' /*or a.created_by = 'auto_approve_all_pending'*/ then 1 else 0 end as pre_approved_flg
 
 ,a.risk_view_report_id
