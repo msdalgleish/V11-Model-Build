@@ -7,11 +7,11 @@ $$ Language sql rows 30
 commit;
 
 
--- drop table if exists jfoster1.customer_net_fees;
--- create table jfoster1.customer_net_fees as
+-- drop table if exists mdalgleish.customer_net_fees;
+-- create table mdalgleish.customer_net_fees as
 
--- drop table if exists jfoster1.net_fees_prestatus;
--- create table jfoster1.net_fees_prestatus as
+-- drop table if exists mdalgleish.net_fees_prestatus;
+-- create table mdalgleish.net_fees_prestatus as
 
 -- drop table if exists first_funded;
 -- create temp table first_funded as
@@ -32,7 +32,7 @@ where 1=1
 --THIS CONTROLS HOW OLD YOUR CUSTOMERS ARE
     and l.funding_date_actual >= current_date - interval'36 month'
 
-    
+
 -- and l.customer_id = (21663720)
 -- and l.customer_id = (11971531)
 and l.customer_id in (21663720,21700534)
@@ -41,8 +41,8 @@ and l.customer_id in (21663720,21700534)
 
 
 
--- drop table if exists jfoster1.customer_net_fees;
--- create table jfoster1.customer_net_fees as
+-- drop table if exists mdalgleish.customer_net_fees;
+-- create table mdalgleish.customer_net_fees as
 -- drop table if exists net_fees_prestatus;
 -- create temp table net_fees_prestatus as
 ,net_fees_prestatus as
@@ -54,7 +54,7 @@ select t.customer_id
     ,((tm.months * length_of_month) * interval'1 day' + t.funding_date_actual)::date as calc_date
 
 --  ,ls.status_cd
--- 
+--
 --     ,sum(coalesce(
 --         case when ls.status_cd in ('in_default','in_default_pmt_proc','paid_off')
 --             and t.sub_type_cd not in ('customer_balance_reconciliation')
@@ -195,8 +195,8 @@ order by customer_id,month_calculated -- Useful for testing, otherwise your mont
 -- ;
 
 
--- drop table if exists jfoster1.customer_net_fees;
--- create table jfoster1.customer_net_fees as
+-- drop table if exists mdalgleish.customer_net_fees;
+-- create table mdalgleish.customer_net_fees as
 select n.customer_id
     ,n.first_funded_loan_id
     ,n.first_funding_date_actual
@@ -279,10 +279,10 @@ select distinct on (l.account_id)
     ,ls.loan_status
     ,cl.id as cnu_loan_id
     ,cl.funding_date_actual as cnu_funding_date_actual
-from nbox_portfolio_portfolio.loans l 
-inner join nbox_portfolio_portfolio.loan_applications la 
+from nbox_portfolio_portfolio.loans l
+inner join nbox_portfolio_portfolio.loan_applications la
     using (loan_agreement_id)
-inner join nbox_portfolio_portfolio.loan_statuses ls 
+inner join nbox_portfolio_portfolio.loan_statuses ls
     using (loan_status_id)
 inner join nbox_identity_identity.accounts ac
     on ac.account_id = l.account_id
@@ -324,16 +324,16 @@ where 1=1
 )
 
 --What does our data look like now?
--- select * from txoh_cust 
+-- select * from txoh_cust
 -- where loan_status = 'current'
- -- limit 1000; 
+ -- limit 1000;
 
  -- select state,count(1),count(account_id),count(distinct account_id) from txoh_cust group by 1;
 
 
 ,ohtx_cashout as (
 
-select ot.* 
+select ot.*
     ,m.mon
     ,least(ot.first_funding_date,ot.cnu_funding_date_actual) + (m.mon * interval'1 month') as max_date_of_interest
     ,sum(l.amount) as total_cash_out
@@ -359,7 +359,7 @@ left join nbox_portfolio_portfolio.loans l  --Get all those loans
         ,11
         ,12
         )
--- left join nbox_portfolio_portfolio.loan_statuses ls 
+-- left join nbox_portfolio_portfolio.loan_statuses ls
 --  on ls.loan_status_id = l.loan_status_id
 --  and ls.loan_status in ( --Only want loans in a funded status
 --      'current',
@@ -387,9 +387,9 @@ left join nbox_portfolio_portfolio.loan_status_history lsh  --Need to determine 
         order by lsh9.id asc
         limit 1
         )
-where 1=1 
-    
-group by 
+where 1=1
+
+group by
     ot.first_funded_loan_id
     ,ot.account_id
     ,ot.first_funding_date
@@ -415,7 +415,7 @@ group by
 
 , ohtx_net_cash as (
 
-select 
+select
     ot.*
     ,round(coalesce(sum(case when (acc.account ~ 'interest'
         or acc.account ~ 'cso_fee'
@@ -431,7 +431,7 @@ select
         or acc.account ~ 'principal') and acc2.account = 'cso_cash'
         then e.amount / (1+0.12/365.25)^(l.disbursement_date-least(ot.first_funding_date,ot.cnu_funding_date_actual)) else 0 end) - ot.defaulted_principal
         else sum(
-            case 
+            case
             when (acc.account ~* 'interest' or acc.account ~* 'cso_fee')
                 and acc2.account = 'cso_cash'
             then e.amount / (1+0.12/365.25)^(l.disbursement_date-least(ot.first_funding_date,ot.cnu_funding_date_actual))
@@ -447,7 +447,7 @@ select
 from ohtx_cashout ot
 inner join nbox_portfolio_portfolio.loans l
     using (account_id)
-inner join nbox_portfolio_portfolio.loan_statuses ls 
+inner join nbox_portfolio_portfolio.loan_statuses ls
     using (loan_status_id)
 left join nbox_portfolio_portfolio.payments p   --Get payments
     on p.loan_id = l.loan_id
@@ -466,7 +466,7 @@ left join nbox_portfolio_accounting.accounts acc    --Get the split between prin
     on acc.account_id = et.credit_account_id
 left join nbox_portfolio_accounting.accounts acc2   --Get the split between principal and intrest
     on acc2.account_id = et.debit_account_id
-where 1=1 
+where 1=1
     and ls.loan_status in (
         'current',
         'paid_off',
@@ -475,7 +475,7 @@ where 1=1
         'past_due',
         'discharged'
         )
-group by 
+group by
     ot.first_funded_loan_id
     ,ot.account_id
     ,ot.first_funding_date
@@ -502,14 +502,14 @@ group by
     SELECT n.first_funded_loan_id as cab_first_funded_loan_id
         ,n.account_id
         ,n.cnu_customer_id
-        ,n.first_funding_date as cab_first_funding 
+        ,n.first_funding_date as cab_first_funding
         ,least(n.first_funding_date, n.cnu_funding_date_actual) as true_first_funding
         ,n.state
         ,n.cnu_loan_id
         ,n.mon
         ,n.net_fees
-        
-        
+
+
         FROM ohtx_net_cash n
         $token2$) As
             p(
@@ -521,7 +521,7 @@ group by
         state text,
         cnu_loan_id int,
         mon int,
-        net_fees numeric) 
+        net_fees numeric)
     ;
 create index tmp_cabnf_custid_idx on ohtx_net_fees(cnu_customer_id);
 
@@ -540,8 +540,8 @@ create index tmp_cabnf_custid_idx on ohtx_net_fees(cnu_customer_id);
 
 
 
-drop table if exists jfoster1.all_customer_net_fees;
-create table jfoster1.all_customer_net_fees as
+drop table if exists mdalgleish.all_customer_net_fees;
+create table mdalgleish.all_customer_net_fees as
 (select n.customer_id as cnu_customer_id
     ,o.account_id
     ,n.first_funded_loan_id
@@ -554,13 +554,13 @@ create table jfoster1.all_customer_net_fees as
     ,case when n.net_fees is null
             and o.net_fees is null
         then null
-        else 
-            coalesce(n.net_fees,0) 
-            + coalesce(o.net_fees,0) 
+        else
+            coalesce(n.net_fees,0)
+            + coalesce(o.net_fees,0)
         end as net_fees
-    
--- from jfoster1.customer_nfpv n
-from jfoster1.customer_net_fees n
+
+-- from mdalgleish.customer_nfpv n
+from mdalgleish.customer_net_fees n
 left join ohtx_net_fees o
     on o.cnu_customer_id = n.customer_id
     and o.mon = n.month_calculated
@@ -580,13 +580,13 @@ select o.cnu_customer_id as cnu_customer_id
     ,case when n.net_fees is null
             and o.net_fees is null
         then null
-        else 
-            coalesce(n.net_fees,0) 
-            + coalesce(o.net_fees,0) 
+        else
+            coalesce(n.net_fees,0)
+            + coalesce(o.net_fees,0)
         end as net_fees
-    
+
 from ohtx_net_fees o
-left join jfoster1.customer_net_fees n
+left join mdalgleish.customer_net_fees n
     on o.cnu_customer_id = n.customer_id
     and o.mon = n.month_calculated
 where o.true_first_funding::date >= '2014-01-01'::date
@@ -605,7 +605,7 @@ create index tmp_allnfpv_custid_idx on all_customer_net_fees(cnu_customer_id);
 -- order by mon
 -- ;
 
-select * from jfoster1.all_customer_net_fees
+select * from mdalgleish.all_customer_net_fees
 order by month_calculated
 ;
 
@@ -625,4 +625,3 @@ order by month_calculated
 --          `~~~`
 -- AUK! AUK! AUK!
 -- If you did the Knowledge Master trivia competitions in high school you know whats up!
-
