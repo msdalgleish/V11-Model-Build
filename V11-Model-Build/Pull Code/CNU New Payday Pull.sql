@@ -41,6 +41,7 @@ l.id as loan_id
 ,a.default_rate as app_default_rate
 ,a.credit_score as app_credit_score
 ,a.profitability_rate as app_profitability_rate
+,ltr.six_month_score as app_six_month_score
 ,ltr.twelve_month_score as app_twelve_month_score
 ,ba.application_id
 ,c.created_on as customer_created

@@ -46,6 +46,9 @@ l.id as loan_id
 ,a.default_rate as app_default_rate
 ,a.credit_score as app_credit_score
 ,a.profitability_rate as app_profitability_rate
+,ltr.six_month_score as app_six_month_score
+,ltr.twelve_month_score as app_twelve_month_score
+,ltr.twelve_month_score_adj as app_twelve_month_score_adjusted
 ,ba.application_id
 ,c.created_on as customer_created
 ,l.gov_law_state_cd as state
@@ -98,6 +101,8 @@ left join customer_sources cs3 on cs3.id = /*must be imported*/
 
 left join customer_sources cs4 on cs4.id = /*not imported*/
 (select id from customer_sources where customer_id = l.customer_id and created_on between a.processed_on - interval '3 days' and a.processed_on + interval '30 minutes' and type_cd not in ('import','lead_reject_import','pass_active_customer') order by id asc limit 1)
+
+left join long_term_results ltr on ltr.id = a.long_term_result_id
 
 where a.existing_flg = 'f'
 ;

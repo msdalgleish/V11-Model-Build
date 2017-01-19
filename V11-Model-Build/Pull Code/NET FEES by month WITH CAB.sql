@@ -204,10 +204,10 @@ select n.customer_id
     ,calc_date
     ,l.id
     ,l2.id
---     ,case when ls.status_cd in ('in_default','in_default_pmt_proc','paid_off')
---         then net_fees_final_status
---         else net_fees_in_flight
---         end as net_fees
+     ,case when ls.status_cd in ('in_default','in_default_pmt_proc','paid_off')
+         then net_fees_final_status
+         else net_fees_in_flight
+         end as net_fees
 from net_fees_prestatus n
 left join loans l
     on l.customer_id = n.customer_id
@@ -218,17 +218,17 @@ left join loans l2
     and l2.funding_date_actual <= n.calc_date
     and ma.issued(l2.status_cd)
     and l2.id > l.id
--- left join loan_statuses ls
---     on ls.loan_id = l.id
---     and ls.eff_start_time::Date <= calc_date
+ left join loan_statuses ls
+     on ls.loan_id = l.id
+     and ls.eff_start_time::Date <= calc_date
 -- --     and ls.eff_start_time::Date >= current_date - interval'37 month'
--- left join loan_statuses ls2
---     on ls2.loan_id = l.id
---     and ls2.eff_start_time::date <= calc_date
+ left join loan_statuses ls2
+     on ls2.loan_id = l.id
+     and ls2.eff_start_time::date <= calc_date
 -- --     and ls2.eff_start_time::date >= current_date - interval'37 month'
---     and ls2.id > ls.id
+     and ls2.id > ls.id
 where 1=1
---     and ls2.id is null
+     and ls2.id is null
     and l2.id is null
 -- limit 100
 order by customer_id,month_calculated
