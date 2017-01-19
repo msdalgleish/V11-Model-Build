@@ -77,14 +77,16 @@ select t.customer_id
 --         ) as net_fees
     ,sum(coalesce(
         case when t.sub_type_cd not in ('customer_balance_reconciliation')
-            then (total_amount - coalesce(misc_fees,0))
+            --then (total_amount - coalesce(misc_fees,0))
+            then (total_amount) -- SWITCH
         end
         ,0)
         ) as net_fees_final_status
     ,sum(coalesce(
     Case when t.sub_type_cd <> 'principal_out'
             and t.sub_type_cd in ('customer_balance_reconciliation','payment')
-            then (interest /*+ misc_fees*/)
+            --then (interest /*+ misc_fees*/)
+            then (interest + misc_fees) -- SWITCH
         End
         ,0)
         ) as net_fees_in_flight
